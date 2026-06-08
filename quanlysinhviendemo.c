@@ -22,10 +22,10 @@ typedef struct Node {
   struct Node *next;
 } Node;
 
-// --- Khai báo nguyên hàm  ---
+//  Khai báo nguyên hàm (Con tro ham) 
 typedef int (*CompareFunc)(HocVien, HocVien);
 
-int my_getch();
+int my_getch();//An phim khong can Enter
 void xoaManHinh();
 void tamDung();
 void inDuongNgang(int kieu, int chieuRongTrong);
@@ -39,13 +39,15 @@ void themHocVien(const char *filename);
 void inDanhSach(const char *filename);
 
 Node *docDanhSachLienKet(const char *filename);
-void giaiPhongLienKet(Node *head);
-int containsIgnoreCase(const char *haystack, const char *needle);
+void giaiPhongLienKet(Node *head);//Giai phong bo nho cho danh sach lien ket
+int containsIgnoreCase(const char *haystack, const char *needle);//Tim kiem ten gan dung
 void inDanhSachLienKet(Node *head, const char *title);
 
 void menuSapXep(const char *filename);
 void menuTimKiem(const char *filename);
 void menuThongKe(const char *filename);
+int timKiemNhiPhan(HocVien arr[], int n, HocVien key, CompareFunc cmp);
+int kiemTraNgayHopLe(int ngay, int thang, int nam);
 
 // Bắt ngay phím lập tức mà không cần nhấn Enter
 int my_getch() {
@@ -126,18 +128,18 @@ void inThongBao(const char *thongBao, int kieuLoai) {
   int w = 58;
   inDuongNgang(0, w);
   if (kieuLoai == 1) {
-    inDongKhung("[ THANH CONG ]", w, 1, "\033[1;32m", "\033[0m"); // màu xanh lá
+    inDongKhung("[ THANH CONG ]", w, 1, "\033[1;32m", "\033[0m"); // màu xanh lá(32),033 là mã escape để bắt đầu màu, 0m để reset màu
   } else if (kieuLoai == 2) {
-    inDongKhung("[ CANH BAO ]", w, 1, "\033[1;33m", "\033[0m"); // màu vàng
+    inDongKhung("[ CANH BAO ]", w, 1, "\033[1;33m", "\033[0m"); // màu vàng(33),1 là mã hiệu cho chữ in đậm
   } else if (kieuLoai == 3) {
-    inDongKhung("[ LOI ]", w, 1, "\033[1;31m", "\033[0m"); // màu đỏ
+    inDongKhung("[ LOI ]", w, 1, "\033[1;31m", "\033[0m"); // màu đỏ(31)
   } else {
-    inDongKhung("[ THONG BAO ]", w, 1, "\033[1;36m", "\033[0m"); // màu xanh lam
+    inDongKhung("[ THONG BAO ]", w, 1, "\033[1;36m", "\033[0m"); // màu xanh lam(36)
   }
   inDuongNgang(1, w);
   inDongKhung("", w, 0, NULL, NULL);       // in dong trong
   inDongKhung(thongBao, w, 1, NULL, NULL); // in thông báo
-  inDongKhung("", w, 0, NULL, NULL);       // in dòng trong
+  inDongKhung("", w, 0, NULL, NULL);       
   inDuongNgang(2, w);
 }
 
@@ -443,6 +445,26 @@ void mergeSort(HocVien arr[], int l, int r, CompareFunc cmp) {
   }
 }
 
+// --- TIM KIEM NHI PHAN (Binary Search) ---
+// Tra ve chi so phan tu tim thay dau tien, hoac -1 neu khong tim thay
+// Yeu cau: mang arr[] DA DUOC SAP XEP theo cmp truoc khi goi ham nay
+int timKiemNhiPhan(HocVien arr[], int n, HocVien key, CompareFunc cmp) {
+  int low = 0, high = n - 1, result = -1;
+  while (low <= high) {
+    int mid = (low + high) / 2;
+    int c = cmp(arr[mid], key);
+    if (c == 0) {
+      result = mid;
+      high = mid - 1; // Tim vi tri ben trai nhat (phan tu dau tien khop)
+    } else if (c < 0) {
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+  return result;
+}
+
 int docDanhSachDuLieu(const char *filename, HocVien **arr) {
   FILE *f = fopen(filename, "rb");
   if (!f)
@@ -659,137 +681,181 @@ void inDanhSachLienKet(Node *head, const char *title) {
 }
 
 void menuTimKiem(const char *filename) {
-  int lc;
-  const char *menuItems[] = {"Tim kiem theo Ma SV (Chinh xac)",
-                             "Tim kiem theo Ho ten (Gan dung)",
-                             "Tim kiem theo Ma lop",
-                             "Tim kiem theo Khoang diem TBTL",
-                             "Tim kiem theo Nam sinh",
+  int lc_algo, lc_key;
+  const char *algoItems[] = {"Tim kiem Tuan tu (Sequential Search)",
+                             "Tim kiem Nhi phan (Binary Search)",
                              "Quay lai menu chinh"};
+  const char *keyItems[] = {"Tim theo Ma Lop",    "Tim theo Ma SV",
+                            "Tim theo Ho Ten",    "Tim theo Ngay Sinh",
+                            "Tim theo Diem TBTL", "Quay lai"};
 
   do {
-    lc = hienThiMenu("MENU TIM KIEM (M4)", menuItems, 6, 0);
-    if (lc >= 1 && lc <= 5) {
-      Node *head = docDanhSachLienKet(filename);
-      if (!head) {
-        xoaManHinh();
-        inThongBao("File chua ton tai hoac khong co du lieu!", 3);
-        tamDung();
-        continue;
-      }
-
-      Node *filteredHead = NULL, *filteredTail = NULL;
-      char query[100];
-      float minVal = 0, maxVal = 10;
-      int yearQuery = 2000;
-
-      if (lc == 1) {
-        nhapChuoiCoKiemTra("Nhap Ma SV can tim: ", query, sizeof(query),
-                           "Khong duoc de trong!");
-      } else if (lc == 2) {
-        nhapChuoiCoKiemTra("Nhap Ho ten can tim (gan dung): ", query,
-                           sizeof(query), "Khong duoc de trong!");
-      } else if (lc == 3) {
-        nhapChuoiCoKiemTra("Nhap Ma lop can tim: ", query, sizeof(query),
-                           "Khong duoc de trong!");
-      } else if (lc == 4) {
-        char scoreBuf[100];
-        while (1) {
-          printf("Nhap Khoang diem TBTL (min max, vi du: 8.0 9.5): ");
-          if (fgets(scoreBuf, sizeof(scoreBuf), stdin)) {
-            if (sscanf(scoreBuf, "%f %f", &minVal, &maxVal) == 2) {
-              if (minVal >= 0 && minVal <= 10 && maxVal >= 0 && maxVal <= 10 &&
-                  minVal <= maxVal) {
-                break;
-              }
-            }
-          }
-          printf("\033[31mLoi: Diem phai tu 0-10 va min <= max!\033[0m");
-          fflush(stdout);
-          usleep(1000000);
-          printf("\r\033[2K\033[A\033[2K");
+    lc_algo = hienThiMenu("MENU TIM KIEM (M4)", algoItems, 3, 0);
+    if (lc_algo >= 1 && lc_algo <= 2) {
+      lc_key = hienThiMenu("CHON KHOA TIM KIEM", keyItems, 6, 0);
+      if (lc_key >= 1 && lc_key <= 5) {
+        // Doc du lieu vao mang
+        HocVien *arr = NULL;
+        int n = docDanhSachDuLieu(filename, &arr);
+        if (n == 0) {
+          xoaManHinh();
+          inThongBao("File chua ton tai hoac khong co du lieu!", 3);
+          tamDung();
+          continue;
         }
-      } else if (lc == 5) {
-        char yearBuf[100];
-        while (1) {
-          printf("Nhap Nam sinh can tim: ");
-          if (fgets(yearBuf, sizeof(yearBuf), stdin)) {
-            if (sscanf(yearBuf, "%d", &yearQuery) == 1) {
-              if (yearQuery >= 1900 && yearQuery <= 2100) {
-                break;
-              }
-            }
-          }
-          printf("\033[31mLoi: Nam sinh khong hop le (1900-2100)!\033[0m");
-          fflush(stdout);
-          usleep(1000000);
-          printf("\r\033[2K\033[A\033[2K");
-        }
-      }
 
-      // Duyệt danh sách liên kết để lọc
-      Node *curr = head;
-      while (curr) {
-        int match = 0;
-        switch (lc) {
+        // Chon ham so sanh tuong ung voi khoa tim kiem (con tro ham)
+        CompareFunc cmp = NULL;
+        switch (lc_key) {
         case 1:
-          if (strcmp(curr->data.maSV, query) == 0)//so sánh từng kí tự mã sinh viên với query
-            match = 1;
+          cmp = cmpMaLop;
           break;
         case 2:
-          if (containsIgnoreCase(curr->data.hoTen, query))//so sánh từng kí tự tên sinh viên với query không phân biệt hoa thường
-            match = 1;
+          cmp = cmpMaSV;
           break;
         case 3:
-          if (containsIgnoreCase(curr->data.maLop, query))//so sánh từng kí tự mã lớp với query không phân biệt hoa thường
-            match = 1;
+          cmp = cmpHoTen;
           break;
         case 4:
-          if (curr->data.dtbtl >= minVal && curr->data.dtbtl <= maxVal)//so sánh điểm trung bình với minVal và maxVal
-            match = 1;
+          cmp = cmpNgaySinh;
           break;
         case 5:
-          if (curr->data.ngaySinh.nam == yearQuery)//so sánh năm sinh với yearQuery
-            match = 1;
+          cmp = cmpDTBTL;
           break;
         }
 
-        if (match) {
-          Node *newNode = (Node *)malloc(sizeof(Node));
-          newNode->data = curr->data;
-          newNode->next = NULL;
-          if (!filteredHead) {
-            filteredHead = newNode;
-          } else {
-            filteredTail->next = newNode;
+        // Tao khoa tim kiem (HocVien key chi dien truong can tim)
+        HocVien key;
+        memset(&key, 0, sizeof(HocVien));
+        char titleStr[150];
+
+        xoaManHinh();
+        printf("\n");
+
+        if (lc_key == 1) {
+          nhapChuoiCoKiemTra("Nhap Ma Lop can tim: ", key.maLop,
+                             sizeof(key.maLop), "Khong duoc de trong!");
+          sprintf(titleStr, "KET QUA TIM KIEM MA LOP: %s", key.maLop);
+        } else if (lc_key == 2) {
+          nhapChuoiCoKiemTra("Nhap Ma SV can tim: ", key.maSV,
+                             sizeof(key.maSV), "Khong duoc de trong!");
+          sprintf(titleStr, "KET QUA TIM KIEM MA SV: %s", key.maSV);
+        } else if (lc_key == 3) {
+          nhapChuoiCoKiemTra("Nhap Ho va ten can tim: ", key.hoTen,
+                             sizeof(key.hoTen), "Khong duoc de trong!");
+          chuanHoaTen(key.hoTen);
+          sprintf(titleStr, "KET QUA TIM KIEM HO TEN: %s", key.hoTen);
+        } else if (lc_key == 4) {
+          char buffer[100];
+          while (1) {
+            printf("Nhap Ngay sinh can tim (dd mm yyyy): ");
+            if (fgets(buffer, sizeof(buffer), stdin)) {
+              if (sscanf(buffer, "%d %d %d", &key.ngaySinh.ngay,
+                         &key.ngaySinh.thang, &key.ngaySinh.nam) == 3) {
+                if (kiemTraNgayHopLe(key.ngaySinh.ngay, key.ngaySinh.thang,
+                                    key.ngaySinh.nam)) {
+                  break;
+                }
+              }
+            }
+            printf("\033[31mLoi: Ngay sinh khong hop le!\033[0m");
+            fflush(stdout);
+            usleep(1000000);
+            printf("\r\033[2K\033[A\033[2K");
           }
-          filteredTail = newNode;
+          sprintf(titleStr, "KET QUA TIM KIEM NGAY SINH: %02d/%02d/%04d",
+                  key.ngaySinh.ngay, key.ngaySinh.thang, key.ngaySinh.nam);
+        } else if (lc_key == 5) {
+          char buffer[100];
+          while (1) {
+            printf("Nhap Diem TBTL can tim: ");
+            if (fgets(buffer, sizeof(buffer), stdin)) {
+              if (sscanf(buffer, "%f", &key.dtbtl) == 1) {
+                if (key.dtbtl >= 0.0 && key.dtbtl <= 10.0) {
+                  break;
+                }
+              }
+            }
+            printf("\033[31mLoi: Diem phai tu 0 den 10!\033[0m");
+            fflush(stdout);
+            usleep(1000000);
+            printf("\r\033[2K\033[A\033[2K");
+          }
+          sprintf(titleStr, "KET QUA TIM KIEM DIEM TBTL: %.2f", key.dtbtl);
         }
-        curr = curr->next;
+
+        // Xay dung danh sach ket qua
+        Node *resultHead = NULL, *resultTail = NULL;
+        int soKetQua = 0;
+        const char *tenThuatToan =
+            (lc_algo == 1) ? "Tuan tu (Sequential)" : "Nhi phan (Binary)";
+
+        if (lc_algo == 1) {
+          // === TIM KIEM TUAN TU (Sequential Search) ===
+          // Duyet toan bo mang, kiem tra tung phan tu voi ham so sanh
+          for (int i = 0; i < n; i++) {
+            if (cmp(arr[i], key) == 0) {
+              Node *newNode = (Node *)malloc(sizeof(Node));
+              newNode->data = arr[i];
+              newNode->next = NULL;
+              if (!resultHead)
+                resultHead = newNode;
+              else
+                resultTail->next = newNode;
+              resultTail = newNode;
+              soKetQua++;
+            }
+          }
+        } else {
+          // === TIM KIEM NHI PHAN (Binary Search) ===
+          // Buoc 1: Sap xep mang theo khoa tim kiem (bat buoc cho nhi phan)
+          quickSort(arr, 0, n - 1, cmp);
+
+          // Buoc 2: Tim kiem nhi phan — tim vi tri dau tien khop
+          int found = timKiemNhiPhan(arr, n, key, cmp);
+
+          if (found != -1) {
+            // Buoc 3: Mo rong sang trai/phai de tim TAT CA phan tu trung khoa
+            int left = found, right = found;
+            while (left > 0 && cmp(arr[left - 1], key) == 0)
+              left--;
+            while (right < n - 1 && cmp(arr[right + 1], key) == 0)
+              right++;
+
+            // Thu thap ket qua
+            for (int i = left; i <= right; i++) {
+              Node *newNode = (Node *)malloc(sizeof(Node));
+              newNode->data = arr[i];
+              newNode->next = NULL;
+              if (!resultHead)
+                resultHead = newNode;
+              else
+                resultTail->next = newNode;
+              resultTail = newNode;
+              soKetQua++;
+            }
+          }
+        }
+
+        // In ket qua tim kiem
+        inDanhSachLienKet(resultHead, titleStr);
+
+        // In thong tin thuat toan da su dung
+        char infoStr[200];
+        sprintf(infoStr, "Thuat toan: %s | Tim thay: %d ket qua",
+                tenThuatToan, soKetQua);
+        printf("\n");
+        inDuongNgang(0, 76);
+        inDongKhung(infoStr, 76, 1, "\033[1;33m", "\033[0m");
+        inDuongNgang(2, 76);
+
+        // Giai phong bo nho
+        giaiPhongLienKet(resultHead);
+        free(arr);
+        tamDung();
       }
-
-      // In kết quả
-      char titleStr[150];
-      if (lc == 1)
-        sprintf(titleStr, "KET QUA TIM KIEM MA SV: %s", query);
-      else if (lc == 2)
-        sprintf(titleStr, "KET QUA TIM KIEM HO TEN CHUA: %s", query);
-      else if (lc == 3)
-        sprintf(titleStr, "KET QUA TIM KIEM MA LOP CHUA: %s", query);
-      else if (lc == 4)
-        sprintf(titleStr, "KET QUA TIM KIEM DIEM TRONG KHOANG: %.2f - %.2f",
-                minVal, maxVal);
-      else if (lc == 5)
-        sprintf(titleStr, "KET QUA TIM KIEM NAM SINH: %d", yearQuery);
-
-      inDanhSachLienKet(filteredHead, titleStr);
-
-      // Giải phóng bộ nhớ của cả 2 danh sách liên kết
-      giaiPhongLienKet(filteredHead);
-      giaiPhongLienKet(head);
-      tamDung();
     }
-  } while (lc != 6);
+  } while (lc_algo != 3);
 }
 
 void menuThongKe(const char *filename) {

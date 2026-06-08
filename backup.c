@@ -22,10 +22,10 @@ typedef struct Node {
   struct Node *next;
 } Node;
 
-// --- Khai báo nguyên hàm  ---
+//  Khai báo nguyên hàm (Con tro ham) 
 typedef int (*CompareFunc)(HocVien, HocVien);
 
-int my_getch();
+int my_getch();//An phim khong can Enter
 void xoaManHinh();
 void tamDung();
 void inDuongNgang(int kieu, int chieuRongTrong);
@@ -39,8 +39,8 @@ void themHocVien(const char *filename);
 void inDanhSach(const char *filename);
 
 Node *docDanhSachLienKet(const char *filename);
-void giaiPhongLienKet(Node *head);
-int containsIgnoreCase(const char *haystack, const char *needle);
+void giaiPhongLienKet(Node *head);//Giai phong bo nho cho danh sach lien ket
+int containsIgnoreCase(const char *haystack, const char *needle);//Tim kiem ten gan dung
 void inDanhSachLienKet(Node *head, const char *title);
 
 void menuSapXep(const char *filename);
@@ -126,18 +126,18 @@ void inThongBao(const char *thongBao, int kieuLoai) {
   int w = 58;
   inDuongNgang(0, w);
   if (kieuLoai == 1) {
-    inDongKhung("[ THANH CONG ]", w, 1, "\033[1;32m", "\033[0m"); // màu xanh lá
+    inDongKhung("[ THANH CONG ]", w, 1, "\033[1;32m", "\033[0m"); // màu xanh lá(32),033 là mã escape để bắt đầu màu, 0m để reset màu
   } else if (kieuLoai == 2) {
-    inDongKhung("[ CANH BAO ]", w, 1, "\033[1;33m", "\033[0m"); // màu vàng
+    inDongKhung("[ CANH BAO ]", w, 1, "\033[1;33m", "\033[0m"); // màu vàng(33),1 là mã hiệu cho chữ in đậm
   } else if (kieuLoai == 3) {
-    inDongKhung("[ LOI ]", w, 1, "\033[1;31m", "\033[0m"); // màu đỏ
+    inDongKhung("[ LOI ]", w, 1, "\033[1;31m", "\033[0m"); // màu đỏ(31)
   } else {
-    inDongKhung("[ THONG BAO ]", w, 1, "\033[1;36m", "\033[0m"); // màu xanh lam
+    inDongKhung("[ THONG BAO ]", w, 1, "\033[1;36m", "\033[0m"); // màu xanh lam(36)
   }
   inDuongNgang(1, w);
   inDongKhung("", w, 0, NULL, NULL);       // in dong trong
   inDongKhung(thongBao, w, 1, NULL, NULL); // in thông báo
-  inDongKhung("", w, 0, NULL, NULL);       // in dòng trong
+  inDongKhung("", w, 0, NULL, NULL);       
   inDuongNgang(2, w);
 }
 
