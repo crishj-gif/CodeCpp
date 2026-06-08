@@ -927,61 +927,91 @@ void menuThongKe(const char *filename) {
         inDuongNgang(2, 58);
 
       } else if (lc == 2) {
-        // Thống kê tỷ lệ học tập
-        int xuatSac = 0;   // >= 9.0
-        int gioi = 0;      // >= 8.0 && < 9.0
-        int kha = 0;       // >= 6.5 && < 8.0
-        int trungBinh = 0; // >= 5.0 && < 6.5
-        int yeu = 0;       // < 5.0
-        int total = 0;
+        // Thống kê tỷ lệ học tập theo lớp
+        xoaManHinh();
+        inDuongNgang(0, 76);
+        inDongKhung("THONG KE TY LE HOC TAP THEO LOP", 76, 1, "\033[1;34m", "\033[0m");
+        inDuongNgang(1, 76);
+        printf("│ %-10s │ %-8s │ %-8s │ %-8s │ %-8s │ %-8s │ %-6s │\n", 
+               "Lop", "X.Sac", "Gioi", "Kha", "T.Binh", "Yeu", "Tong");
+        printf("├────────────┼──────────┼──────────┼──────────┼──────────┼──────────┼────────┤\n");
+
+        typedef struct {
+          char maLop[15];
+          int xuatSac;
+          int gioi;
+          int kha;
+          int trungBinh;
+          int yeu;
+          int total;
+        } ThongKeLopHocLuc;
+
+        ThongKeLopHocLuc tk[100];
+        int nLop = 0;
+        memset(tk, 0, sizeof(tk));
 
         Node *curr = head;
         while (curr) {
+          int foundLop = -1;
+          for (int i = 0; i < nLop; i++) {
+            if (strcmp(tk[i].maLop, curr->data.maLop) == 0) {
+              foundLop = i;
+              break;
+            }
+          }
+
+          if (foundLop == -1) {
+            foundLop = nLop;
+            strcpy(tk[nLop].maLop, curr->data.maLop);
+            nLop++;
+          }
+
           float d = curr->data.dtbtl;
           if (d >= 9.0)
-            xuatSac++;
+            tk[foundLop].xuatSac++;
           else if (d >= 8.0)
-            gioi++;
+            tk[foundLop].gioi++;
           else if (d >= 6.5)
-            kha++;
+            tk[foundLop].kha++;
           else if (d >= 5.0)
-            trungBinh++;
+            tk[foundLop].trungBinh++;
           else
-            yeu++;
+            tk[foundLop].yeu++;
 
-          total++;
+          tk[foundLop].total++;
           curr = curr->next;
         }
 
-        xoaManHinh();
-        inDuongNgang(0, 58);
-        inDongKhung("THONG KE TY LE HOC TAP", 58, 1, "\033[1;34m", "\033[0m");
-        inDuongNgang(1, 58);
-        printf("│ %-15s │ %-15s │ %-18s │\n", "Phan Loai", "So Luong",
-               "Ty Le (%)");
-        printf("├─────────────────┼─────────────────┼────────────────────┤\n");
+        int totalHocVien = 0;
+        for (int i = 0; i < nLop; i++) {
+          char xsStr[20], giStr[20], khStr[20], tbStr[20], yeStr[20], totStr[10];
+          
+          if (tk[i].total > 0) {
+            sprintf(xsStr, "%d(%.0f%%)", tk[i].xuatSac, (float)tk[i].xuatSac / tk[i].total * 100);
+            sprintf(giStr, "%d(%.0f%%)", tk[i].gioi, (float)tk[i].gioi / tk[i].total * 100);
+            sprintf(khStr, "%d(%.0f%%)", tk[i].kha, (float)tk[i].kha / tk[i].total * 100);
+            sprintf(tbStr, "%d(%.0f%%)", tk[i].trungBinh, (float)tk[i].trungBinh / tk[i].total * 100);
+            sprintf(yeStr, "%d(%.0f%%)", tk[i].yeu, (float)tk[i].yeu / tk[i].total * 100);
+          } else {
+            strcpy(xsStr, "0(0%)");
+            strcpy(giStr, "0(0%)");
+            strcpy(khStr, "0(0%)");
+            strcpy(tbStr, "0(0%)");
+            strcpy(yeStr, "0(0%)");
+          }
+          sprintf(totStr, "%d", tk[i].total);
+          totalHocVien += tk[i].total;
 
-        if (total > 0) {
-          printf("│ %-15s │ %-15d │ %-17.2f%% │\n", "Xuat sac", xuatSac,
-                 (float)xuatSac / total * 100);
-          printf("│ %-15s │ %-15d │ %-17.2f%% │\n", "Gioi", gioi,
-                 (float)gioi / total * 100);
-          printf("│ %-15s │ %-15d │ %-17.2f%% │\n", "Kha", kha,
-                 (float)kha / total * 100);
-          printf("│ %-15s │ %-15d │ %-17.2f%% │\n", "Trung binh", trungBinh,
-                 (float)trungBinh / total * 100);
-          printf("│ %-15s │ %-15d │ %-17.2f%% │\n", "Yeu", yeu,
-                 (float)yeu / total * 100);
-        } else {
-          printf("│ (Danh sach rong)                                     │\n");
+          printf("│ %-10s │ %-8s │ %-8s │ %-8s │ %-8s │ %-8s │ %-6s │\n",
+                 tk[i].maLop, xsStr, giStr, khStr, tbStr, yeStr, totStr);
         }
-        printf("└─────────────────┴─────────────────┴────────────────────┘\n");
+        printf("└────────────┴──────────┴──────────┴──────────┴──────────┴──────────┴────────┘\n");
 
         char summary[100];
-        sprintf(summary, "Tong so hoc vien da thong ke: %d", total);
-        inDuongNgang(0, 58);
-        inDongKhung(summary, 58, 1, "\033[1;32m", "\033[0m");
-        inDuongNgang(2, 58);
+        sprintf(summary, "Tong so lop: %d. Tong so hoc vien: %d", nLop, totalHocVien);
+        inDuongNgang(0, 76);
+        inDongKhung(summary, 76, 1, "\033[1;32m", "\033[0m");
+        inDuongNgang(2, 76);
       }
 
       giaiPhongLienKet(head);
