@@ -599,7 +599,7 @@ void giaiPhongLienKet(Node *head) {
     free(temp);
   }
 }
-
+//Hàm lõi tìm kiếm tên gần đúng
 int containsIgnoreCase(const char *haystack, const char *needle) {
   if (!haystack || !needle)
     return 0;
@@ -733,23 +733,23 @@ void menuTimKiem(const char *filename) {
         int match = 0;
         switch (lc) {
         case 1:
-          if (strcmp(curr->data.maSV, query) == 0)
+          if (strcmp(curr->data.maSV, query) == 0)//so sánh từng kí tự mã sinh viên với query
             match = 1;
           break;
         case 2:
-          if (containsIgnoreCase(curr->data.hoTen, query))
+          if (containsIgnoreCase(curr->data.hoTen, query))//so sánh từng kí tự tên sinh viên với query không phân biệt hoa thường
             match = 1;
           break;
         case 3:
-          if (containsIgnoreCase(curr->data.maLop, query))
+          if (containsIgnoreCase(curr->data.maLop, query))//so sánh từng kí tự mã lớp với query không phân biệt hoa thường
             match = 1;
           break;
         case 4:
-          if (curr->data.dtbtl >= minVal && curr->data.dtbtl <= maxVal)
+          if (curr->data.dtbtl >= minVal && curr->data.dtbtl <= maxVal)//so sánh điểm trung bình với minVal và maxVal
             match = 1;
           break;
         case 5:
-          if (curr->data.ngaySinh.nam == yearQuery)
+          if (curr->data.ngaySinh.nam == yearQuery)//so sánh năm sinh với yearQuery
             match = 1;
           break;
         }
