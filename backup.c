@@ -1104,7 +1104,6 @@ void themHocVien(const char *filename) {
 
 void inDanhSach(const char *filename) {
   xoaManHinh();
-}
   inDuongNgang(0, 76);
   inDongKhung("DANH SACH HOC VIEN (TOAN BO)", 76, 1, "\033[1;34m", "\033[0m");
   inDuongNgang(1, 76);
