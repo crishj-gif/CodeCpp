@@ -22,10 +22,10 @@ typedef struct Node {
   struct Node *next;
 } Node;
 
-//  Khai báo nguyên hàm (Con tro ham) 
+//  Khai báo nguyên hàm (Con tro ham)
 typedef int (*CompareFunc)(HocVien, HocVien);
 
-int my_getch();//An phim khong can Enter
+int my_getch(); // An phim khong can Enter
 void xoaManHinh();
 void tamDung();
 void inDuongNgang(int kieu, int chieuRongTrong);
@@ -36,11 +36,17 @@ int hienThiMenu(const char *title, const char *menuItems[], int numItems,
                 int defaultIdx);
 void chuanHoaTen(char *name);
 void themHocVien(const char *filename);
+void suaHocVien(const char *filename);
+void xoaHocVien(const char *filename);
+void menuQuanLyHoSo(const char *filename);
 void inDanhSach(const char *filename);
+void inDanhSachTheoLop(const char *filename);
+void menuInDanhSach(const char *filename);
 
 Node *docDanhSachLienKet(const char *filename);
-void giaiPhongLienKet(Node *head);//Giai phong bo nho cho danh sach lien ket
-int containsIgnoreCase(const char *haystack, const char *needle);//Tim kiem ten gan dung
+void giaiPhongLienKet(Node *head); // Giai phong bo nho cho danh sach lien ket
+int containsIgnoreCase(const char *haystack,
+                       const char *needle); // Tim kiem ten gan dung
 void inDanhSachLienKet(Node *head, const char *title);
 
 void menuSapXep(const char *filename);
@@ -128,18 +134,22 @@ void inThongBao(const char *thongBao, int kieuLoai) {
   int w = 58;
   inDuongNgang(0, w);
   if (kieuLoai == 1) {
-    inDongKhung("[ THANH CONG ]", w, 1, "\033[1;32m", "\033[0m"); // màu xanh lá(32),033 là mã escape để bắt đầu màu, 0m để reset màu
+    inDongKhung("[ THANH CONG ]", w, 1, "\033[1;32m",
+                "\033[0m"); // màu xanh lá(32),033 là mã escape để bắt đầu màu,
+                            // 0m để reset màu
   } else if (kieuLoai == 2) {
-    inDongKhung("[ CANH BAO ]", w, 1, "\033[1;33m", "\033[0m"); // màu vàng(33),1 là mã hiệu cho chữ in đậm
+    inDongKhung("[ CANH BAO ]", w, 1, "\033[1;33m",
+                "\033[0m"); // màu vàng(33),1 là mã hiệu cho chữ in đậm
   } else if (kieuLoai == 3) {
     inDongKhung("[ LOI ]", w, 1, "\033[1;31m", "\033[0m"); // màu đỏ(31)
   } else {
-    inDongKhung("[ THONG BAO ]", w, 1, "\033[1;36m", "\033[0m"); // màu xanh lam(36)
+    inDongKhung("[ THONG BAO ]", w, 1, "\033[1;36m",
+                "\033[0m"); // màu xanh lam(36)
   }
   inDuongNgang(1, w);
   inDongKhung("", w, 0, NULL, NULL);       // in dong trong
   inDongKhung(thongBao, w, 1, NULL, NULL); // in thông báo
-  inDongKhung("", w, 0, NULL, NULL);       
+  inDongKhung("", w, 0, NULL, NULL);
   inDuongNgang(2, w);
 }
 
@@ -247,9 +257,9 @@ int main() {
   int firstTimeExit = 1;
   const char *dataFile = "sinhvien.bin";
   // định nghĩa menu chính
-  const char *menuMain[] = {"Them moi ho so",    "In danh sach hoc vien",
-                            "Sap xep danh sach", "Tim kiem hoc vien",
-                            "Thong ke bao cao",  "Thoat chuong trinh"};
+  const char *menuMain[] = {"Them, sua, xoa ho so", "In danh sach hoc vien",
+                            "Sap xep danh sach",    "Tim kiem hoc vien",
+                            "Thong ke bao cao",     "Thoat chuong trinh"};
 
   do {
     // "Khi vào chức năng nào thì mục đang chọn vẫn đang là số 3" => mặc định
@@ -259,10 +269,10 @@ int main() {
 
     switch (luaChon) {
     case 1:
-      themHocVien(dataFile);
+      menuQuanLyHoSo(dataFile);
       break;
     case 2:
-      inDanhSach(dataFile);
+      menuInDanhSach(dataFile);
       break;
     case 3:
       menuSapXep(dataFile);
@@ -621,7 +631,7 @@ void giaiPhongLienKet(Node *head) {
     free(temp);
   }
 }
-//Hàm lõi tìm kiếm tên gần đúng
+// Hàm lõi tìm kiếm tên gần đúng
 int containsIgnoreCase(const char *haystack, const char *needle) {
   if (!haystack || !needle)
     return 0;
@@ -631,7 +641,7 @@ int containsIgnoreCase(const char *haystack, const char *needle) {
     return 0;
 
   for (int i = 0; i <= hLen - nLen; i++) {
-    int match = 1;
+    int match = 1; // su dung flag de danh dau neu tat ca cac ky tu deu khop
     for (int j = 0; j < nLen; j++) {
       if (tolower((unsigned char)haystack[i + j]) !=
           tolower((unsigned char)needle[j])) {
@@ -737,8 +747,8 @@ void menuTimKiem(const char *filename) {
                              sizeof(key.maLop), "Khong duoc de trong!");
           sprintf(titleStr, "KET QUA TIM KIEM MA LOP: %s", key.maLop);
         } else if (lc_key == 2) {
-          nhapChuoiCoKiemTra("Nhap Ma SV can tim: ", key.maSV,
-                             sizeof(key.maSV), "Khong duoc de trong!");
+          nhapChuoiCoKiemTra("Nhap Ma SV can tim: ", key.maSV, sizeof(key.maSV),
+                             "Khong duoc de trong!");
           sprintf(titleStr, "KET QUA TIM KIEM MA SV: %s", key.maSV);
         } else if (lc_key == 3) {
           nhapChuoiCoKiemTra("Nhap Ho va ten can tim: ", key.hoTen,
@@ -753,7 +763,7 @@ void menuTimKiem(const char *filename) {
               if (sscanf(buffer, "%d %d %d", &key.ngaySinh.ngay,
                          &key.ngaySinh.thang, &key.ngaySinh.nam) == 3) {
                 if (kiemTraNgayHopLe(key.ngaySinh.ngay, key.ngaySinh.thang,
-                                    key.ngaySinh.nam)) {
+                                     key.ngaySinh.nam)) {
                   break;
                 }
               }
@@ -842,8 +852,8 @@ void menuTimKiem(const char *filename) {
 
         // In thong tin thuat toan da su dung
         char infoStr[200];
-        sprintf(infoStr, "Thuat toan: %s | Tim thay: %d ket qua",
-                tenThuatToan, soKetQua);
+        sprintf(infoStr, "Thuat toan: %s | Tim thay: %d ket qua", tenThuatToan,
+                soKetQua);
         printf("\n");
         inDuongNgang(0, 76);
         inDongKhung(infoStr, 76, 1, "\033[1;33m", "\033[0m");
@@ -930,11 +940,13 @@ void menuThongKe(const char *filename) {
         // Thống kê tỷ lệ học tập theo lớp
         xoaManHinh();
         inDuongNgang(0, 76);
-        inDongKhung("THONG KE TY LE HOC TAP THEO LOP", 76, 1, "\033[1;34m", "\033[0m");
+        inDongKhung("THONG KE TY LE HOC TAP THEO LOP", 76, 1, "\033[1;34m",
+                    "\033[0m");
         inDuongNgang(1, 76);
-        printf("│ %-10s │ %-8s │ %-8s │ %-8s │ %-8s │ %-8s │ %-6s │\n", 
-               "Lop", "X.Sac", "Gioi", "Kha", "T.Binh", "Yeu", "Tong");
-        printf("├────────────┼──────────┼──────────┼──────────┼──────────┼──────────┼────────┤\n");
+        printf("│ %-10s │ %-8s │ %-8s │ %-8s │ %-8s │ %-8s │ %-6s │\n", "Lop",
+               "X.Sac", "Gioi", "Kha", "T.Binh", "Yeu", "Tong");
+        printf("├────────────┼──────────┼──────────┼──────────┼──────────┼─────"
+               "─────┼────────┤\n");
 
         typedef struct {
           char maLop[15];
@@ -984,14 +996,20 @@ void menuThongKe(const char *filename) {
 
         int totalHocVien = 0;
         for (int i = 0; i < nLop; i++) {
-          char xsStr[20], giStr[20], khStr[20], tbStr[20], yeStr[20], totStr[10];
-          
+          char xsStr[20], giStr[20], khStr[20], tbStr[20], yeStr[20],
+              totStr[10];
+
           if (tk[i].total > 0) {
-            sprintf(xsStr, "%d(%.0f%%)", tk[i].xuatSac, (float)tk[i].xuatSac / tk[i].total * 100);
-            sprintf(giStr, "%d(%.0f%%)", tk[i].gioi, (float)tk[i].gioi / tk[i].total * 100);
-            sprintf(khStr, "%d(%.0f%%)", tk[i].kha, (float)tk[i].kha / tk[i].total * 100);
-            sprintf(tbStr, "%d(%.0f%%)", tk[i].trungBinh, (float)tk[i].trungBinh / tk[i].total * 100);
-            sprintf(yeStr, "%d(%.0f%%)", tk[i].yeu, (float)tk[i].yeu / tk[i].total * 100);
+            sprintf(xsStr, "%d(%.0f%%)", tk[i].xuatSac,
+                    (float)tk[i].xuatSac / tk[i].total * 100);
+            sprintf(giStr, "%d(%.0f%%)", tk[i].gioi,
+                    (float)tk[i].gioi / tk[i].total * 100);
+            sprintf(khStr, "%d(%.0f%%)", tk[i].kha,
+                    (float)tk[i].kha / tk[i].total * 100);
+            sprintf(tbStr, "%d(%.0f%%)", tk[i].trungBinh,
+                    (float)tk[i].trungBinh / tk[i].total * 100);
+            sprintf(yeStr, "%d(%.0f%%)", tk[i].yeu,
+                    (float)tk[i].yeu / tk[i].total * 100);
           } else {
             strcpy(xsStr, "0(0%)");
             strcpy(giStr, "0(0%)");
@@ -1005,10 +1023,12 @@ void menuThongKe(const char *filename) {
           printf("│ %-10s │ %-8s │ %-8s │ %-8s │ %-8s │ %-8s │ %-6s │\n",
                  tk[i].maLop, xsStr, giStr, khStr, tbStr, yeStr, totStr);
         }
-        printf("└────────────┴──────────┴──────────┴──────────┴──────────┴──────────┴────────┘\n");
+        printf("└────────────┴──────────┴──────────┴──────────┴──────────┴─────"
+               "─────┴────────┘\n");
 
         char summary[100];
-        sprintf(summary, "Tong so lop: %d. Tong so hoc vien: %d", nLop, totalHocVien);
+        sprintf(summary, "Tong so lop: %d. Tong so hoc vien: %d", nLop,
+                totalHocVien);
         inDuongNgang(0, 76);
         inDongKhung(summary, 76, 1, "\033[1;32m", "\033[0m");
         inDuongNgang(2, 76);
@@ -1062,138 +1082,158 @@ void themHocVien(const char *filename) {
   strcpy(hv.maLop, "");
   strcpy(hv.maSV, "");
   strcpy(hv.hoTen, "");
-  hv.ngaySinh.ngay = 0; hv.ngaySinh.thang = 0; hv.ngaySinh.nam = 0;
+  hv.ngaySinh.ngay = 0;
+  hv.ngaySinh.thang = 0;
+  hv.ngaySinh.nam = 0;
   hv.dtbtl = -1.0;
 
   int currentIdx = 0;
   int w = 65;
 
-  while(1) {
+  while (1) {
     xoaManHinh();
     inDuongNgang(0, w);
     inDongKhung("THEM MOI HO SO HOC VIEN", w, 1, "\033[1;35m", "\033[0m");
     inDuongNgang(1, w);
     inDongKhung("", w, 0, NULL, NULL);
-    
+
     char items[7][150];
     sprintf(items[0], "Nhap Ma Lop:    [ %s ]", hv.maLop[0] ? hv.maLop : "...");
     sprintf(items[1], "Nhap Ma SV:     [ %s ]", hv.maSV[0] ? hv.maSV : "...");
     sprintf(items[2], "Nhap Ho Ten:    [ %s ]", hv.hoTen[0] ? hv.hoTen : "...");
     if (hv.ngaySinh.ngay != 0)
-        sprintf(items[3], "Nhap Ngay Sinh: [ %02d/%02d/%04d ]", hv.ngaySinh.ngay, hv.ngaySinh.thang, hv.ngaySinh.nam);
+      sprintf(items[3], "Nhap Ngay Sinh: [ %02d/%02d/%04d ]", hv.ngaySinh.ngay,
+              hv.ngaySinh.thang, hv.ngaySinh.nam);
     else
-        sprintf(items[3], "Nhap Ngay Sinh: [ ... ]");
-        
+      sprintf(items[3], "Nhap Ngay Sinh: [ ... ]");
+
     if (hv.dtbtl >= 0)
-        sprintf(items[4], "Nhap Diem:      [ %.2f ]", hv.dtbtl);
+      sprintf(items[4], "Nhap Diem:      [ %.2f ]", hv.dtbtl);
     else
-        sprintf(items[4], "Nhap Diem:      [ ... ]");
-        
+      sprintf(items[4], "Nhap Diem:      [ ... ]");
+
     strcpy(items[5], "[ LUU HO SO ]");
     strcpy(items[6], "[ HUY BO VA QUAY LAI ]");
-    
+
     for (int i = 0; i < 7; i++) {
-        char line[200];
-        if (i == currentIdx) {
-            sprintf(line, "  -> %d. %s", i + 1, items[i]);
-            inDongKhung(line, w, 0, "\033[1;32m", "\033[0m");
-        } else {
-            sprintf(line, "     %d. %s", i + 1, items[i]);
-            inDongKhung(line, w, 0, NULL, NULL);
-        }
+      char line[200];
+      if (i == currentIdx) {
+        sprintf(line, "  -> %d. %s", i + 1, items[i]);
+        inDongKhung(line, w, 0, "\033[1;32m", "\033[0m");
+      } else {
+        sprintf(line, "     %d. %s", i + 1, items[i]);
+        inDongKhung(line, w, 0, NULL, NULL);
+      }
     }
-    
+
     inDongKhung("", w, 0, NULL, NULL);
     inDuongNgang(1, w);
-    inDongKhung("(Dung phim mui ten Len/Xuong de chon, Enter de nhap)", w, 1, "\033[1;30m", "\033[0m");
+    inDongKhung("(Dung phim mui ten Len/Xuong de chon, Enter de nhap)", w, 1,
+                "\033[1;30m", "\033[0m");
     inDuongNgang(2, w);
-    
+
     int ch1 = my_getch();
     if (ch1 == '\n' || ch1 == '\r') {
-        printf("\n"); 
-        if (currentIdx == 0) {
-            nhapChuoiCoKiemTra("Nhap Ma lop: ", hv.maLop, sizeof(hv.maLop), "Khong duoc de trong!");
-        } else if (currentIdx == 1) {
-            while (1) {
-                nhapChuoiCoKiemTra("Nhap Ma SV (Bat dau bang 'SV'): ", hv.maSV, sizeof(hv.maSV), "Khong duoc de trong!");
-                if (strncmp(hv.maSV, "SV", 2) != 0 && strncmp(hv.maSV, "sv", 2) != 0 && strncmp(hv.maSV, "sV", 2) != 0 && strncmp(hv.maSV, "Sv", 2) != 0) {
-                    printf("\033[31mLoi: Ma SV phai bat dau bang chu 'SV'!\033[0m"); fflush(stdout);
-                    usleep(1500000);
-                    printf("\r\033[2K\033[A\033[2K");
-                    continue;
-                }
-                hv.maSV[0] = 'S'; hv.maSV[1] = 'V'; 
-                
-                if (kiemTraTrungMaSV(filename, hv.maSV)) {
-                    printf("\033[31mLoi: Ma SV nay da ton tai!\033[0m"); fflush(stdout);
-                    usleep(1500000);
-                    printf("\r\033[2K\033[A\033[2K");
-                } else {
-                    break;
-                }
-            }
-        } else if (currentIdx == 2) {
-            nhapChuoiCoKiemTra("Nhap Ho va ten: ", hv.hoTen, sizeof(hv.hoTen), "Khong duoc de trong!");
-            chuanHoaTen(hv.hoTen);
-        } else if (currentIdx == 3) {
-            char buffer[100];
-            while(1) {
-                printf("Nhap Ngay sinh (dd mm yyyy): ");
-                if (fgets(buffer, sizeof(buffer), stdin)) {
-                    if (sscanf(buffer, "%d %d %d", &hv.ngaySinh.ngay, &hv.ngaySinh.thang, &hv.ngaySinh.nam) == 3) {
-                        if (kiemTraNgayHopLe(hv.ngaySinh.ngay, hv.ngaySinh.thang, hv.ngaySinh.nam)) {
-                            break;
-                        }
-                    }
-                }
-                printf("\033[31mLoi: Ngay sinh khong hop le!\033[0m"); fflush(stdout);
-                usleep(1000000);
-                printf("\r\033[2K\033[A\033[2K");
-            }
-        } else if (currentIdx == 4) {
-            char buffer[100];
-            while(1) {
-                printf("Nhap Diem TBTL (0-10): ");
-                if (fgets(buffer, sizeof(buffer), stdin)) {
-                    if (sscanf(buffer, "%f", &hv.dtbtl) == 1) {
-                        if (hv.dtbtl >= 0.0 && hv.dtbtl <= 10.0) {
-                            break;
-                        }
-                    }
-                }
-                printf("\033[31mLoi: Diem phai tu 0 den 10!\033[0m"); fflush(stdout);
-                usleep(1000000);
-                printf("\r\033[2K\033[A\033[2K");
-            }
-        } else if (currentIdx == 5) {
-            if (strlen(hv.maLop) == 0 || strlen(hv.maSV) == 0 || strlen(hv.hoTen) == 0 || hv.ngaySinh.ngay == 0 || hv.dtbtl < 0) {
-                xoaManHinh();
-                inThongBao("Vui long nhap day du cac truong truoc khi Luu!", 2);
-                tamDung();
-            } else {
-                FILE *f = fopen(filename, "ab");
-                if (!f) {
-                    xoaManHinh();
-                    inThongBao("Khong the mo file de ghi!", 3);
-                } else {
-                    fwrite(&hv, sizeof(HocVien), 1, f);
-                    fclose(f);
-                    xoaManHinh();
-                    inThongBao("Da them ho so hoc vien thanh cong!", 1);
-                }
-                tamDung();
-                return;
-            }
-        } else if (currentIdx == 6) {
-            return;
+      printf("\n");
+      if (currentIdx == 0) {
+        nhapChuoiCoKiemTra("Nhap Ma lop: ", hv.maLop, sizeof(hv.maLop),
+                           "Khong duoc de trong!");
+      } else if (currentIdx == 1) {
+        while (1) {
+          nhapChuoiCoKiemTra("Nhap Ma SV (Bat dau bang 'SV'): ", hv.maSV,
+                             sizeof(hv.maSV), "Khong duoc de trong!");
+          if (strncmp(hv.maSV, "SV", 2) != 0 &&
+              strncmp(hv.maSV, "sv", 2) != 0 &&
+              strncmp(hv.maSV, "sV", 2) != 0 &&
+              strncmp(hv.maSV, "Sv", 2) != 0) {
+            printf("\033[31mLoi: Ma SV phai bat dau bang chu 'SV'!\033[0m");
+            fflush(stdout);
+            usleep(1500000);
+            printf("\r\033[2K\033[A\033[2K");
+            continue;
+          }
+          hv.maSV[0] = 'S';
+          hv.maSV[1] = 'V';
+
+          if (kiemTraTrungMaSV(filename, hv.maSV)) {
+            printf("\033[31mLoi: Ma SV nay da ton tai!\033[0m");
+            fflush(stdout);
+            usleep(1500000);
+            printf("\r\033[2K\033[A\033[2K");
+          } else {
+            break;
+          }
         }
+      } else if (currentIdx == 2) {
+        nhapChuoiCoKiemTra("Nhap Ho va ten: ", hv.hoTen, sizeof(hv.hoTen),
+                           "Khong duoc de trong!");
+        chuanHoaTen(hv.hoTen);
+      } else if (currentIdx == 3) {
+        char buffer[100];
+        while (1) {
+          printf("Nhap Ngay sinh (dd mm yyyy): ");
+          if (fgets(buffer, sizeof(buffer), stdin)) {
+            if (sscanf(buffer, "%d %d %d", &hv.ngaySinh.ngay,
+                       &hv.ngaySinh.thang, &hv.ngaySinh.nam) == 3) {
+              if (kiemTraNgayHopLe(hv.ngaySinh.ngay, hv.ngaySinh.thang,
+                                   hv.ngaySinh.nam)) {
+                break;
+              }
+            }
+          }
+          printf("\033[31mLoi: Ngay sinh khong hop le!\033[0m");
+          fflush(stdout);
+          usleep(1000000);
+          printf("\r\033[2K\033[A\033[2K");
+        }
+      } else if (currentIdx == 4) {
+        char buffer[100];
+        while (1) {
+          printf("Nhap Diem TBTL (0-10): ");
+          if (fgets(buffer, sizeof(buffer), stdin)) {
+            if (sscanf(buffer, "%f", &hv.dtbtl) == 1) {
+              if (hv.dtbtl >= 0.0 && hv.dtbtl <= 10.0) {
+                break;
+              }
+            }
+          }
+          printf("\033[31mLoi: Diem phai tu 0 den 10!\033[0m");
+          fflush(stdout);
+          usleep(1000000);
+          printf("\r\033[2K\033[A\033[2K");
+        }
+      } else if (currentIdx == 5) {
+        if (strlen(hv.maLop) == 0 || strlen(hv.maSV) == 0 ||
+            strlen(hv.hoTen) == 0 || hv.ngaySinh.ngay == 0 || hv.dtbtl < 0) {
+          xoaManHinh();
+          inThongBao("Vui long nhap day du cac truong truoc khi Luu!", 2);
+          tamDung();
+        } else {
+          FILE *f = fopen(filename, "ab");
+          if (!f) {
+            xoaManHinh();
+            inThongBao("Khong the mo file de ghi!", 3);
+          } else {
+            fwrite(&hv, sizeof(HocVien), 1, f);
+            fclose(f);
+            xoaManHinh();
+            inThongBao("Da them ho so hoc vien thanh cong!", 1);
+          }
+          tamDung();
+          return;
+        }
+      } else if (currentIdx == 6) {
+        return;
+      }
     } else if (ch1 == 27) {
-        int ch2 = my_getch();
-        if (ch2 == 91) {
-            int ch3 = my_getch();
-            if (ch3 == 65) currentIdx = (currentIdx > 0) ? currentIdx - 1 : 6;
-            else if (ch3 == 66) currentIdx = (currentIdx < 6) ? currentIdx + 1 : 0;
-        }
+      int ch2 = my_getch();
+      if (ch2 == 91) {
+        int ch3 = my_getch();
+        if (ch3 == 65)
+          currentIdx = (currentIdx > 0) ? currentIdx - 1 : 6;
+        else if (ch3 == 66)
+          currentIdx = (currentIdx < 6) ? currentIdx + 1 : 0;
+      }
     }
   }
 }
@@ -1241,6 +1281,345 @@ void inDanhSach(const char *filename) {
     inDuongNgang(2, 76);
   }
 
+  tamDung();
+}
+
+// --- IN DANH SÁCH THEO LỚP ---
+void inDanhSachTheoLop(const char *filename) {
+  Node *head = docDanhSachLienKet(filename);
+  if (!head) {
+    xoaManHinh();
+    inThongBao("File chua ton tai hoac khong co du lieu!", 3);
+    tamDung();
+    return;
+  }
+
+  // Nhập mã lớp cần in
+  char maLop[15];
+  xoaManHinh();
+  printf("\n");
+  nhapChuoiCoKiemTra("Nhap Ma Lop can in: ", maLop, sizeof(maLop),
+                     "Khong duoc de trong!");
+
+  // Lọc danh sách theo lớp
+  Node *resultHead = NULL, *resultTail = NULL;
+  int count = 0;
+  Node *curr = head;
+  while (curr) {
+    if (strcmp(curr->data.maLop, maLop) == 0) {
+      Node *newNode = (Node *)malloc(sizeof(Node));
+      newNode->data = curr->data;
+      newNode->next = NULL;
+      if (!resultHead)
+        resultHead = newNode;
+      else
+        resultTail->next = newNode;
+      resultTail = newNode;
+      count++;
+    }
+    curr = curr->next;
+  }
+
+  // In kết quả
+  char titleStr[100];
+  sprintf(titleStr, "DANH SACH HOC VIEN LOP: %s", maLop);
+  inDanhSachLienKet(resultHead, titleStr);
+
+  if (count == 0) {
+    printf("\n");
+    char msg[100];
+    sprintf(msg, "Khong tim thay hoc vien nao thuoc lop: %s", maLop);
+    inThongBao(msg, 2);
+  }
+
+  giaiPhongLienKet(resultHead);
+  giaiPhongLienKet(head);
+  tamDung();
+}
+
+// --- MENU IN DANH SÁCH (M2) ---
+void menuInDanhSach(const char *filename) {
+  int lc;
+  const char *menuItems[] = {"In danh sach toan bo", "In danh sach theo lop",
+                             "Quay lai menu chinh"};
+
+  do {
+    lc = hienThiMenu("IN DANH SACH HOC VIEN (M2)", menuItems, 3, 0);
+    switch (lc) {
+    case 1:
+      inDanhSach(filename);
+      break;
+    case 2:
+      inDanhSachTheoLop(filename);
+      break;
+    case 3:
+      break;
+    }
+  } while (lc != 3);
+}
+
+// --- MENU QUẢN LÝ HỒ SƠ (THÊM, SỬA, XÓA) ---
+void menuQuanLyHoSo(const char *filename) {
+  int lc;
+  const char *menuItems[] = {"Them moi ho so", "Sua ho so hoc vien",
+                             "Xoa ho so hoc vien", "Quay lai menu chinh"};
+
+  do {
+    lc = hienThiMenu("QUAN LY HO SO (M1)", menuItems, 4, 0);
+    switch (lc) {
+    case 1:
+      themHocVien(filename);
+      break;
+    case 2:
+      suaHocVien(filename);
+      break;
+    case 3:
+      xoaHocVien(filename);
+      break;
+    case 4:
+      break;
+    }
+  } while (lc != 4);
+}
+
+// --- SỬA HỒ SƠ HỌC VIÊN ---
+void suaHocVien(const char *filename) {
+  HocVien *arr = NULL;
+  int n = docDanhSachDuLieu(filename, &arr);
+  if (n == 0) {
+    xoaManHinh();
+    inThongBao("Danh sach rong, khong co ho so de sua!", 3);
+    tamDung();
+    return;
+  }
+
+  // Nhập mã SV cần sửa
+  char maSV[15];
+  xoaManHinh();
+  printf("\n");
+  nhapChuoiCoKiemTra("Nhap Ma SV can sua: ", maSV, sizeof(maSV),
+                     "Khong duoc de trong!");
+
+  // Tìm sinh viên trong mảng
+  int viTri = -1;
+  for (int i = 0; i < n; i++) {
+    if (strcmp(arr[i].maSV, maSV) == 0) {
+      viTri = i;
+      break;
+    }
+  }
+
+  if (viTri == -1) {
+    xoaManHinh();
+    char msg[100];
+    sprintf(msg, "Khong tim thay sinh vien co Ma SV: %s", maSV);
+    inThongBao(msg, 3);
+    free(arr);
+    tamDung();
+    return;
+  }
+
+  // Hiển thị thông tin hiện tại
+  HocVien *hv = &arr[viTri];
+  int currentIdx = 0;
+  int w = 65;
+
+  while (1) {
+    xoaManHinh();
+    inDuongNgang(0, w);
+    inDongKhung("SUA HO SO HOC VIEN", w, 1, "\033[1;35m", "\033[0m");
+    inDuongNgang(1, w);
+
+    // Hiển thị thông tin hiện tại của SV
+    char infoLine[200];
+    sprintf(infoLine, "Dang sua SV: %s - %s", hv->maSV, hv->hoTen);
+    inDongKhung(infoLine, w, 1, "\033[1;33m", "\033[0m");
+    inDuongNgang(1, w);
+    inDongKhung("", w, 0, NULL, NULL);
+
+    char items[7][150];
+    sprintf(items[0], "Ma Lop:      [ %s ]", hv->maLop);
+    sprintf(items[1], "Ho Ten:      [ %s ]", hv->hoTen);
+    sprintf(items[2], "Ngay Sinh:   [ %02d/%02d/%04d ]", hv->ngaySinh.ngay,
+            hv->ngaySinh.thang, hv->ngaySinh.nam);
+    sprintf(items[3], "Diem TBTL:   [ %.2f ]", hv->dtbtl);
+    strcpy(items[4], "[ LUU THAY DOI ]");
+    strcpy(items[5], "[ HUY BO VA QUAY LAI ]");
+
+    for (int i = 0; i < 6; i++) {
+      char line[200];
+      if (i == currentIdx) {
+        sprintf(line, "  -> %d. %s", i + 1, items[i]);
+        inDongKhung(line, w, 0, "\033[1;32m", "\033[0m");
+      } else {
+        sprintf(line, "     %d. %s", i + 1, items[i]);
+        inDongKhung(line, w, 0, NULL, NULL);
+      }
+    }
+
+    inDongKhung("", w, 0, NULL, NULL);
+    inDuongNgang(1, w);
+    inDongKhung("(Phim Len/Xuong de chon, Enter de sua truong do)", w, 1,
+                "\033[1;30m", "\033[0m");
+    inDuongNgang(2, w);
+
+    int ch1 = my_getch();
+    if (ch1 == '\n' || ch1 == '\r') {
+      printf("\n");
+      if (currentIdx == 0) {
+        // Sửa Mã Lớp
+        nhapChuoiCoKiemTra("Nhap Ma Lop moi: ", hv->maLop, sizeof(hv->maLop),
+                           "Khong duoc de trong!");
+      } else if (currentIdx == 1) {
+        // Sửa Họ Tên
+        nhapChuoiCoKiemTra("Nhap Ho Ten moi: ", hv->hoTen, sizeof(hv->hoTen),
+                           "Khong duoc de trong!");
+        chuanHoaTen(hv->hoTen);
+      } else if (currentIdx == 2) {
+        // Sửa Ngày Sinh
+        char buffer[100];
+        while (1) {
+          printf("Nhap Ngay sinh moi (dd mm yyyy): ");
+          if (fgets(buffer, sizeof(buffer), stdin)) {
+            if (sscanf(buffer, "%d %d %d", &hv->ngaySinh.ngay,
+                       &hv->ngaySinh.thang, &hv->ngaySinh.nam) == 3) {
+              if (kiemTraNgayHopLe(hv->ngaySinh.ngay, hv->ngaySinh.thang,
+                                   hv->ngaySinh.nam)) {
+                break;
+              }
+            }
+          }
+          printf("\033[31mLoi: Ngay sinh khong hop le!\033[0m");
+          fflush(stdout);
+          usleep(1000000);
+          printf("\r\033[2K\033[A\033[2K");
+        }
+      } else if (currentIdx == 3) {
+        // Sửa Điểm TBTL
+        char buffer[100];
+        while (1) {
+          printf("Nhap Diem TBTL moi (0-10): ");
+          if (fgets(buffer, sizeof(buffer), stdin)) {
+            if (sscanf(buffer, "%f", &hv->dtbtl) == 1) {
+              if (hv->dtbtl >= 0.0 && hv->dtbtl <= 10.0) {
+                break;
+              }
+            }
+          }
+          printf("\033[31mLoi: Diem phai tu 0 den 10!\033[0m");
+          fflush(stdout);
+          usleep(1000000);
+          printf("\r\033[2K\033[A\033[2K");
+        }
+      } else if (currentIdx == 4) {
+        // Lưu thay đổi
+        ghiDanhSachDuLieu(filename, arr, n);
+        xoaManHinh();
+        inThongBao("Da cap nhat ho so thanh cong!", 1);
+        free(arr);
+        tamDung();
+        return;
+      } else if (currentIdx == 5) {
+        // Hủy bỏ
+        free(arr);
+        return;
+      }
+    } else if (ch1 == 27) {
+      int ch2 = my_getch();
+      if (ch2 == 91) {
+        int ch3 = my_getch();
+        if (ch3 == 65)
+          currentIdx = (currentIdx > 0) ? currentIdx - 1 : 5;
+        else if (ch3 == 66)
+          currentIdx = (currentIdx < 5) ? currentIdx + 1 : 0;
+      }
+    }
+  }
+}
+
+// --- XÓA HỒ SƠ HỌC VIÊN ---
+void xoaHocVien(const char *filename) {
+  HocVien *arr = NULL;
+  int n = docDanhSachDuLieu(filename, &arr);
+  if (n == 0) {
+    xoaManHinh();
+    inThongBao("Danh sach rong, khong co ho so de xoa!", 3);
+    tamDung();
+    return;
+  }
+
+  // Nhập mã SV cần xóa
+  char maSV[15];
+  xoaManHinh();
+  printf("\n");
+  nhapChuoiCoKiemTra("Nhap Ma SV can xoa: ", maSV, sizeof(maSV),
+                     "Khong duoc de trong!");
+
+  // Tìm sinh viên trong mảng
+  int viTri = -1;
+  for (int i = 0; i < n; i++) {
+    if (strcmp(arr[i].maSV, maSV) == 0) {
+      viTri = i;
+      break;
+    }
+  }
+
+  if (viTri == -1) {
+    xoaManHinh();
+    char msg[100];
+    sprintf(msg, "Khong tim thay sinh vien co Ma SV: %s", maSV);
+    inThongBao(msg, 3);
+    free(arr);
+    tamDung();
+    return;
+  }
+
+  // Hiển thị thông tin sinh viên sẽ bị xóa
+  xoaManHinh();
+  int w = 76;
+  inDuongNgang(0, w);
+  inDongKhung("THONG TIN SINH VIEN SE BI XOA", w, 1, "\033[1;31m", "\033[0m");
+  inDuongNgang(1, w);
+
+  printf("│ %-10s │ %-10s │ %-25s │ %-12s │ %-5s │\n", "Ma Lop", "Ma SV",
+         "Ho Ten", "Ngay Sinh", "DTBTL");
+  printf("├────────────┼────────────┼───────────────────────────┼──────────────"
+         "┼───────┤\n");
+  printf("│ %-10s │ %-10s │ %-25s │ %02d/%02d/%04d   │ %-5.2f │\n",
+         arr[viTri].maLop, arr[viTri].maSV, arr[viTri].hoTen,
+         arr[viTri].ngaySinh.ngay, arr[viTri].ngaySinh.thang,
+         arr[viTri].ngaySinh.nam, arr[viTri].dtbtl);
+  printf("└────────────┴────────────┴───────────────────────────┴──────────────"
+         "┴───────┘\n");
+
+  // Xác nhận xóa y/n
+  printf("\n");
+  inDuongNgang(0, 58);
+  inDongKhung("XAC NHAN XOA", 58, 1, "\033[1;33m", "\033[0m");
+  inDuongNgang(1, 58);
+  inDongKhung("", 58, 0, NULL, NULL);
+  inDongKhung("Ban co chac muon xoa sinh vien nay? (y/n)", 58, 1, NULL, NULL);
+  inDongKhung("", 58, 0, NULL, NULL);
+  inDuongNgang(2, 58);
+
+  char confirm = my_getch();
+  if (confirm == 'y' || confirm == 'Y') {
+    // Dịch mảng để xóa phần tử
+    for (int i = viTri; i < n - 1; i++) {
+      arr[i] = arr[i + 1];
+    }
+    n--;
+
+    // Ghi lại file
+    ghiDanhSachDuLieu(filename, arr, n);
+    xoaManHinh();
+    inThongBao("Da xoa ho so sinh vien thanh cong!", 1);
+  } else {
+    xoaManHinh();
+    inThongBao("Da huy thao tac xoa.", 0);
+  }
+
+  free(arr);
   tamDung();
 }
 

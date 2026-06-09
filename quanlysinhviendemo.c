@@ -40,6 +40,8 @@ void suaHocVien(const char *filename);
 void xoaHocVien(const char *filename);
 void menuQuanLyHoSo(const char *filename);
 void inDanhSach(const char *filename);
+void inDanhSachTheoLop(const char *filename);
+void menuInDanhSach(const char *filename);
 
 Node *docDanhSachLienKet(const char *filename);
 void giaiPhongLienKet(Node *head); // Giai phong bo nho cho danh sach lien ket
@@ -270,7 +272,7 @@ int main() {
       menuQuanLyHoSo(dataFile);
       break;
     case 2:
-      inDanhSach(dataFile);
+      menuInDanhSach(dataFile);
       break;
     case 3:
       menuSapXep(dataFile);
@@ -1280,6 +1282,80 @@ void inDanhSach(const char *filename) {
   }
 
   tamDung();
+}
+
+// --- IN DANH SÁCH THEO LỚP ---
+void inDanhSachTheoLop(const char *filename) {
+  Node *head = docDanhSachLienKet(filename);
+  if (!head) {
+    xoaManHinh();
+    inThongBao("File chua ton tai hoac khong co du lieu!", 3);
+    tamDung();
+    return;
+  }
+
+  // Nhập mã lớp cần in
+  char maLop[15];
+  xoaManHinh();
+  printf("\n");
+  nhapChuoiCoKiemTra("Nhap Ma Lop can in: ", maLop, sizeof(maLop),
+                     "Khong duoc de trong!");
+
+  // Lọc danh sách theo lớp
+  Node *resultHead = NULL, *resultTail = NULL;
+  int count = 0;
+  Node *curr = head;
+  while (curr) {
+    if (strcmp(curr->data.maLop, maLop) == 0) {
+      Node *newNode = (Node *)malloc(sizeof(Node));
+      newNode->data = curr->data;
+      newNode->next = NULL;
+      if (!resultHead)
+        resultHead = newNode;
+      else
+        resultTail->next = newNode;
+      resultTail = newNode;
+      count++;
+    }
+    curr = curr->next;
+  }
+
+  // In kết quả
+  char titleStr[100];
+  sprintf(titleStr, "DANH SACH HOC VIEN LOP: %s", maLop);
+  inDanhSachLienKet(resultHead, titleStr);
+
+  if (count == 0) {
+    printf("\n");
+    char msg[100];
+    sprintf(msg, "Khong tim thay hoc vien nao thuoc lop: %s", maLop);
+    inThongBao(msg, 2);
+  }
+
+  giaiPhongLienKet(resultHead);
+  giaiPhongLienKet(head);
+  tamDung();
+}
+
+// --- MENU IN DANH SÁCH (M2) ---
+void menuInDanhSach(const char *filename) {
+  int lc;
+  const char *menuItems[] = {"In danh sach toan bo", "In danh sach theo lop",
+                             "Quay lai menu chinh"};
+
+  do {
+    lc = hienThiMenu("IN DANH SACH HOC VIEN (M2)", menuItems, 3, 0);
+    switch (lc) {
+    case 1:
+      inDanhSach(filename);
+      break;
+    case 2:
+      inDanhSachTheoLop(filename);
+      break;
+    case 3:
+      break;
+    }
+  } while (lc != 3);
 }
 
 // --- MENU QUẢN LÝ HỒ SƠ (THÊM, SỬA, XÓA) ---
