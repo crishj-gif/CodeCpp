@@ -1622,7 +1622,6 @@ void xoaHocVien(const char *filename) {
   free(arr);
   tamDung();
 }
-
 /*
  =====================================================================
  HƯỚNG DẪN BIÊN DỊCH VÀ CHẠY CHƯƠNG TRÌNH (DÀNH CHO TERMINAL LINUX)
